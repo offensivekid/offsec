@@ -19,6 +19,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Trust proxy for Railway/production
+app.set('trust proxy', 1);
+
 const SQLiteStore = connectSqlite3(session);
 const db = new Database(process.env.DB_PATH || './database.sqlite');
 db.pragma('foreign_keys = ON');
