@@ -25,7 +25,14 @@ function showSection(sectionId) {
     document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
     
     document.getElementById(sectionId).classList.add('active');
-    event.target.closest('.nav-tab').classList.add('active');
+    
+    // Find and activate the correct tab
+    const tabs = document.querySelectorAll('.nav-tab');
+    tabs.forEach(tab => {
+        if (tab.getAttribute('onclick') && tab.getAttribute('onclick').includes(sectionId)) {
+            tab.classList.add('active');
+        }
+    });
     
     switch(sectionId) {
         case 'dashboard':
