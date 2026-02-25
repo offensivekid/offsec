@@ -11,6 +11,7 @@ from aiogram.types import (
 )
 from aiogram.filters import CommandStart, Command
 from aiogram.enums import ParseMode
+from aiogram.client.default import DefaultBotProperties
 
 # ── CONFIG ──────────────────────────────────────────────────────
 BOT_TOKEN  = "8759243252:AAGcMEARFHLaWpFDCghswusg2hbcjnBW9nw"
@@ -509,7 +510,7 @@ def main_keyboard() -> InlineKeyboardMarkup:
 
 # ── BOT + DISPATCHER ─────────────────────────────────────────────
 logging.basicConfig(level=logging.INFO)
-bot = Bot(token=BOT_TOKEN, parse_mode=ParseMode.HTML)
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp  = Dispatcher()
 
 # ── /start ────────────────────────────────────────────────────────
