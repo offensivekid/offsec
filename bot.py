@@ -1,4 +1,4 @@
-import asyncio
+6import asyncio
 import logging
 import os
 from aiohttp import web
@@ -12,7 +12,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram.enums import ParseMode
 
 # ── CONFIG ──────────────────────────────────────────────────────
-BOT_TOKEN  = "8751156673:AAHJWBV1jE0VGhIugHOQcGp1zQVciO-d-JQ"
+BOT_TOKEN  = "8759243252:AAGcMEARFHLaWpFDCghswusg2hbcjnBW9nw"
 PORT       = int(os.environ.get("PORT", 8080))
 WEBAPP_URL = os.environ.get("WEBAPP_URL", "https://mini-production-be9c.up.railway.app")
 
