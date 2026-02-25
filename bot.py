@@ -601,7 +601,7 @@ if(jf)jf.addEventListener('submit',function(e){
   var text='<b>Новая заявка — Команда</b>\n\n<b>Telegram:</b> '+username+'\n<b>Имя:</b> '+fullName+'\n<b>Роль:</b> '+spec+'\n<b>Уровень:</b> '+level+'\n<b>Опыт:</b> '+exp+' лет\n<b>Доступность:</b> '+avail+'\n<b>Ставка:</b> '+rate+'\n<b>Часовой пояс:</b> '+tz+'\n<b>Портфолио:</b> '+portfolio+'\n<b>Соцсети:</b> '+socials+'\n\n<b>Навыки:</b>\n'+skills+'\n\n<b>Мотивация:</b>\n'+motivation;
   var btn=jf.querySelector('button[type="submit"]');
   btn.disabled=true;btn.querySelector('span').textContent='Отправка...';
-  fetch('/join_apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,text:text})})
+  fetch(window.location.origin+'/join_apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,text:text})})
     .then(function(r){return r.text();})
     .then(function(res){
       btn.disabled=false;btn.querySelector('span').textContent='Подать заявку';
@@ -758,18 +758,29 @@ async def cb_reject(callback: CallbackQuery):
 # ── ENDPOINT ДЛЯ ПРИЁМА ЗАЯВОК ИЗ MINI APP ───────────────────────
 async def handle_join_apply(request):
     """Принимает JSON с заявкой + user_id, шлёт сообщение в группу с кнопками"""
+    # CORS preflight
+    if request.method == "OPTIONS":
+        return web.Response(status=200, headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+        })
     try:
         data = await request.json()
+        logging.info(f"join_apply received: {data}")
         user_id = data.get("user_id")
         text = data.get("text", "")
 
-        if not user_id or not text:
-            return web.Response(status=400, text="bad request")
+        if not text:
+            return web.Response(status=400, text="no text",
+                headers={"Access-Control-Allow-Origin": "*"})
 
-        kb = InlineKeyboardMarkup(inline_keyboard=[[
-            InlineKeyboardButton(text="✅ Принять", callback_data=f"approve:{user_id}"),
-            InlineKeyboardButton(text="❌ Отказать", callback_data=f"reject:{user_id}"),
-        ]])
+        kb = None
+        if user_id:
+            kb = InlineKeyboardMarkup(inline_keyboard=[[
+                InlineKeyboardButton(text="✅ Принять", callback_data=f"approve:{user_id}"),
+                InlineKeyboardButton(text="❌ Отказать", callback_data=f"reject:{user_id}"),
+            ]])
 
         await bot.send_message(
             chat_id=TG_CHAT,
@@ -777,10 +788,11 @@ async def handle_join_apply(request):
             parse_mode="HTML",
             reply_markup=kb
         )
-        return web.Response(text="ok")
+        return web.Response(text="ok", headers={"Access-Control-Allow-Origin": "*"})
     except Exception as e:
         logging.error(f"handle_join_apply error: {e}")
-        return web.Response(status=500, text=str(e))
+        return web.Response(status=500, text=str(e),
+            headers={"Access-Control-Allow-Origin": "*"})
 
 # ── WEB SERVER (всё из памяти, внешних файлов не нужно) ──────────
 async def handle_index(request):
@@ -790,6 +802,7 @@ async def start_web():
     app = web.Application()
     app.router.add_get("/", handle_index)
     app.router.add_post("/join_apply", handle_join_apply)
+    app.router.add_route("OPTIONS", "/join_apply", handle_join_apply)
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, "0.0.0.0", PORT)
