@@ -601,13 +601,40 @@ if(jf)jf.addEventListener('submit',function(e){
   var text='<b>Новая заявка — Команда</b>\n\n<b>Telegram:</b> '+username+'\n<b>Имя:</b> '+fullName+'\n<b>Роль:</b> '+spec+'\n<b>Уровень:</b> '+level+'\n<b>Опыт:</b> '+exp+' лет\n<b>Доступность:</b> '+avail+'\n<b>Ставка:</b> '+rate+'\n<b>Часовой пояс:</b> '+tz+'\n<b>Портфолио:</b> '+portfolio+'\n<b>Соцсети:</b> '+socials+'\n\n<b>Навыки:</b>\n'+skills+'\n\n<b>Мотивация:</b>\n'+motivation;
   var btn=jf.querySelector('button[type="submit"]');
   btn.disabled=true;btn.querySelector('span').textContent='Отправка...';
-  console.log('join_apply payload:', {user_id:userId,text:text.substring(0,100)});
-  fetch(window.location.origin+'/join_apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,text:text})})
-    .then(function(r){return r.text();})
-    .then(function(res){
+  // Добавляем user_id в текст чтобы бот мог отправить кнопки
+  var fullText = text + (userId ? '\n\n#uid:'+userId : '');
+  fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({chat_id:TG_CHAT,text:fullText,parse_mode:'HTML'})
+  })
+    .then(function(r){return r.json();})
+    .then(function(data){
       btn.disabled=false;btn.querySelector('span').textContent='Подать заявку';
-      if(res==='ok'){if(tg)tg.HapticFeedback.notificationOccurred('success');showSuccess();jf.reset();document.getElementById('levelField').value='';document.querySelectorAll('.level-btn').forEach(function(b){b.classList.remove('active');});}
-      else{alert('Ошибка сервера: '+res);}
+      if(data.ok){
+        // Теперь просим бот добавить кнопки через отдельный запрос
+        if(userId){
+          fetch('https://api.telegram.org/bot'+TG_TOKEN+'/editMessageReplyMarkup',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+              chat_id:TG_CHAT,
+              message_id:data.result.message_id,
+              reply_markup:{inline_keyboard:[[
+                {text:'✅ Принять',callback_data:'approve:'+userId},
+                {text:'❌ Отказать',callback_data:'reject:'+userId}
+              ]]}
+            })
+          });
+        }
+        if(tg)tg.HapticFeedback.notificationOccurred('success');
+        showSuccess();
+        jf.reset();
+        document.getElementById('levelField').value='';
+        document.querySelectorAll('.level-btn').forEach(function(b){b.classList.remove('active');});
+      } else {
+        alert('Ошибка: '+(data.description||'попробуйте ещё раз'));
+      }
     })
     .catch(function(err){btn.disabled=false;btn.querySelector('span').textContent='Подать заявку';alert('Ошибка сети: '+err);});
 });
