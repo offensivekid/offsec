@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import base64
+import json
 from aiohttp import web
 from aiogram import Bot, Dispatcher, F
 from aiogram.types import (
@@ -202,7 +203,7 @@ HTML_PAGE = '''
         .skill-icon-wrap svg { transition: filter 0.25s, transform 0.25s; border-radius: 4px; }
         .skill-icon-wrap:hover svg { filter: drop-shadow(0 0 7px rgba(0,255,136,0.55)); transform: translateY(-2px); }
         .team-card.ceo { border-left: 2px solid var(--g); }
-        .team-card.ceo::after { content: 'FOUNDER'; position: absolute; top: 1.6rem; right: 2rem; font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 0.3em; color: var(--g); opacity: 0.4; }
+        .team-card.ceo::after { content: 'ОСНОВАТЕЛЬ'; position: absolute; top: 1.6rem; right: 2rem; font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 0.3em; color: var(--g); opacity: 0.4; }
         .accordion { border: 1px solid var(--line); }
         .acc-item { border-bottom: 1px solid var(--line); }
         .acc-item:last-child { border-bottom: none; }
@@ -292,7 +293,7 @@ HTML_PAGE = '''
     </style>
 </head>
 <body>
-<div class="loader" id="loader"><div class="loader-ring"></div><div class="loader-text">Initializing...</div></div>
+<div class="loader" id="loader"><div class="loader-ring"></div><div class="loader-text">Загрузка...</div></div>
 <canvas id="bg-canvas"></canvas>
 <nav>
     <a href="#hero" class="logo-svg">
@@ -309,12 +310,12 @@ HTML_PAGE = '''
 </nav>
 <section class="hero" id="hero">
     <div class="hero-inner">
-        <div class="hero-tag">Elite Tech Network</div>
+        <div class="hero-tag">Элитная техническая сеть</div>
         <h1><span>THIN</span><span class="outline">LUCID</span><span>AGENCY</span></h1>
         <p class="hero-sub">Элитная сеть технических специалистов. Мы объединяем лучших разработчиков, дизайнеров и инженеров для создания решений завтрашнего дня.</p>
         <div class="hero-cta"><a href="#team" class="btn-primary">Узнать больше</a><a href="#join" class="btn-ghost">Вступить</a></div>
     </div>
-    <div class="hero-scroll-hint"><span class="scroll-label">Scroll</span><div class="scroll-line"></div></div>
+    <div class="hero-scroll-hint"><span class="scroll-label">Вниз</span><div class="scroll-line"></div></div>
 </section>
 <section id="team">
     <div class="container">
@@ -324,34 +325,32 @@ HTML_PAGE = '''
             <div class="team-card ceo">
                 <div class="card-num">001</div>
                 <h3>@couchancy</h3>
-                <p class="role">CEO &amp; Founder · Thin Lucid Agency</p>
-                <p>Специалист в области кибербезопасности, OSINT-разведки, веб-разработки и написания кода. Строит элитную сеть технических специалистов с нуля.</p>
+                <p class="role">Генеральный директор · Thin Lucid Agency</p>
+                <p>Специалист в области кибербезопасности, веб-разработки и написания кода. Строит элитную сеть технических специалистов с нуля.</p>
                 <div class="skill-icons">
-                    <div class="skill-icon-wrap" title="Cyber"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><path d="M16 4L5 9v6c0 6 4.5 11.6 11 13 6.5-1.4 11-7 11-13V9L16 4z" fill="none" stroke="#00ff88" stroke-width="1.5"/><path d="M11.5 16.5l3 3 6-6" stroke="#00ff88" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Cyber</span></div>
-                    <div class="skill-icon-wrap" title="OSINT"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><path d="M4 16s4-8 12-8 12 8 12 8-4 8-12 8S4 16 4 16z" stroke="#00d4ff" stroke-width="1.5" fill="none"/><circle cx="16" cy="16" r="3.5" stroke="#00d4ff" stroke-width="1.5"/><circle cx="16" cy="16" r="1.2" fill="#00d4ff"/></svg><span>OSINT</span></div>
-                    <div class="skill-icon-wrap" title="Web Dev"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><polyline points="11,10 5,16 11,22" stroke="#00d4ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><polyline points="21,10 27,16 21,22" stroke="#00d4ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="19" y1="9" x2="13" y2="23" stroke="#00ff88" stroke-width="1.3" stroke-linecap="round"/></svg><span>Web Dev</span></div>
+                    <div class="skill-icon-wrap" title="Cyber"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><path d="M16 4L5 9v6c0 6 4.5 11.6 11 13 6.5-1.4 11-7 11-13V9L16 4z" fill="none" stroke="#00ff88" stroke-width="1.5"/><path d="M11.5 16.5l3 3 6-6" stroke="#00ff88" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Защита</span></div> <div class="skill-icon-wrap" title="Web Dev"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><polyline points="11,10 5,16 11,22" stroke="#00d4ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><polyline points="21,10 27,16 21,22" stroke="#00d4ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="19" y1="9" x2="13" y2="23" stroke="#00ff88" stroke-width="1.3" stroke-linecap="round"/></svg><span>Веб</span></div>
                     <div class="skill-icon-wrap" title="Python"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><path d="M16 4c-4.6 0-4.3 2-4.3 2v2.1h4.4v.7H9.4S6.3 8.5 6.3 13.2s2.8 4.5 2.8 4.5h1.7v-2.3s-.1-2.1 2.1-2.1h4.6s2.1.1 2.1-2V6.1S19.9 4 16 4zm-2.5 1.4c.43 0 .77.34.77.77s-.34.77-.77.77-.77-.34-.77-.77.34-.77.77-.77z" fill="#3776AB"/><path d="M16 28c4.6 0 4.3-2 4.3-2v-2.1h-4.4v-.7h6.7s3.1.3 3.1-4.4-2.8-4.5-2.8-4.5h-1.7v2.3s.1 2.1-2.1 2.1h-4.6s-2.1-.1-2.1 2v3.2S12.1 28 16 28zm2.5-1.4c-.43 0-.77-.34-.77-.77s.34-.77.77-.77.77.34.77.77-.34.77-.77.77z" fill="#FFD43B"/></svg><span>Python</span></div>
                     <div class="skill-icon-wrap" title="JS"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#F7DF1E"/><text x="7" y="24" font-family="Arial Black,sans-serif" font-weight="900" font-size="14" fill="#000">JS</text></svg><span>JS</span></div>
                     <div class="skill-icon-wrap" title="Wazuh"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><path d="M4 22l4-12 4 8 4-14 4 10 4-6 4 4" stroke="#00bcd4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="28" cy="22" r="2.5" fill="#00bcd4" opacity="0.7"/></svg><span>Wazuh</span></div>
-                    <div class="skill-icon-wrap" title="Graphics"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><path d="M16 5C9.9 5 5 9.9 5 16c0 6.1 4.9 11 11 11 1.2 0 2.2-1 2.2-2.2 0-.6-.2-1.1-.6-1.5-.3-.4-.6-.9-.6-1.4 0-1.2 1-2.2 2.2-2.2h2.6C25 19.7 27 17.1 27 14 27 9 22 5 16 5z" stroke="#E91E8C" stroke-width="1.4" fill="none"/><circle cx="10" cy="14" r="1.8" fill="#F44336"/><circle cx="13" cy="9.5" r="1.8" fill="#FFEB3B"/><circle cx="19" cy="9.5" r="1.8" fill="#4CAF50"/><circle cx="22" cy="14" r="1.8" fill="#2196F3"/></svg><span>Graphics</span></div>
+                    <div class="skill-icon-wrap" title="Graphics"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><path d="M16 5C9.9 5 5 9.9 5 16c0 6.1 4.9 11 11 11 1.2 0 2.2-1 2.2-2.2 0-.6-.2-1.1-.6-1.5-.3-.4-.6-.9-.6-1.4 0-1.2 1-2.2 2.2-2.2h2.6C25 19.7 27 17.1 27 14 27 9 22 5 16 5z" stroke="#E91E8C" stroke-width="1.4" fill="none"/><circle cx="10" cy="14" r="1.8" fill="#F44336"/><circle cx="13" cy="9.5" r="1.8" fill="#FFEB3B"/><circle cx="19" cy="9.5" r="1.8" fill="#4CAF50"/><circle cx="22" cy="14" r="1.8" fill="#2196F3"/></svg><span>Дизайн</span></div>
                     <div class="skill-icon-wrap" title="VPN"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><rect x="9" y="15" width="14" height="11" rx="2" stroke="#00ff88" stroke-width="1.4"/><path d="M12 15v-3a4 4 0 018 0v3" stroke="#00ff88" stroke-width="1.4" stroke-linecap="round"/><circle cx="16" cy="21" r="1.5" fill="#00ff88"/><line x1="16" y1="21" x2="16" y2="24" stroke="#00ff88" stroke-width="1.3" stroke-linecap="round"/></svg><span>VPN</span></div>
-                    <div class="skill-icon-wrap" title="Proxy"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><rect x="11" y="11" width="10" height="10" rx="2" fill="#00d4ff" opacity="0.2" stroke="#00d4ff" stroke-width="1.3"/><circle cx="5" cy="10" r="2.5" stroke="#00d4ff" stroke-width="1.2"/><circle cx="5" cy="22" r="2.5" stroke="#00d4ff" stroke-width="1.2"/><circle cx="27" cy="10" r="2.5" stroke="#00ff88" stroke-width="1.2"/><circle cx="27" cy="22" r="2.5" stroke="#00ff88" stroke-width="1.2"/><line x1="7.5" y1="10" x2="11" y2="14" stroke="#00d4ff" stroke-width="1.1"/><line x1="7.5" y1="22" x2="11" y2="18" stroke="#00d4ff" stroke-width="1.1"/><line x1="24.5" y1="10" x2="21" y2="14" stroke="#00ff88" stroke-width="1.1"/><line x1="24.5" y1="22" x2="21" y2="18" stroke="#00ff88" stroke-width="1.1"/></svg><span>Proxy</span></div>
+                    <div class="skill-icon-wrap" title="Proxy"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><rect x="11" y="11" width="10" height="10" rx="2" fill="#00d4ff" opacity="0.2" stroke="#00d4ff" stroke-width="1.3"/><circle cx="5" cy="10" r="2.5" stroke="#00d4ff" stroke-width="1.2"/><circle cx="5" cy="22" r="2.5" stroke="#00d4ff" stroke-width="1.2"/><circle cx="27" cy="10" r="2.5" stroke="#00ff88" stroke-width="1.2"/><circle cx="27" cy="22" r="2.5" stroke="#00ff88" stroke-width="1.2"/><line x1="7.5" y1="10" x2="11" y2="14" stroke="#00d4ff" stroke-width="1.1"/><line x1="7.5" y1="22" x2="11" y2="18" stroke="#00d4ff" stroke-width="1.1"/><line x1="24.5" y1="10" x2="21" y2="14" stroke="#00ff88" stroke-width="1.1"/><line x1="24.5" y1="22" x2="21" y2="18" stroke="#00ff88" stroke-width="1.1"/></svg><span>Прокси</span></div>
                 </div>
             </div>
             <div class="team-card">
                 <div class="card-num">002</div>
                 <h3>@mts_mobile</h3>
-                <p class="role">CO-OWNER · Developer</p>
+                <p class="role">Совладелец · Разработчик</p>
                 <p>Разработчик и специалист по безопасности. Строит надёжные системы на низком уровне.</p>
                 <div class="skill-icons">
                     <div class="skill-icon-wrap" title="Python"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><path d="M16 4c-4.6 0-4.3 2-4.3 2v2.1h4.4v.7H9.4S6.3 8.5 6.3 13.2s2.8 4.5 2.8 4.5h1.7v-2.3s-.1-2.1 2.1-2.1h4.6s2.1.1 2.1-2V6.1S19.9 4 16 4zm-2.5 1.4c.43 0 .77.34.77.77s-.34.77-.77.77-.77-.34-.77-.77.34-.77.77-.77z" fill="#3776AB"/><path d="M16 28c4.6 0 4.3-2 4.3-2v-2.1h-4.4v-.7h6.7s3.1.3 3.1-4.4-2.8-4.5-2.8-4.5h-1.7v2.3s.1 2.1-2.1 2.1h-4.6s-2.1-.1-2.1 2v3.2S12.1 28 16 28zm2.5-1.4c-.43 0-.77-.34-.77-.77s.34-.77.77-.77.77.34.77.77-.34.77-.77.77z" fill="#FFD43B"/></svg><span>Python</span></div>
                     <div class="skill-icon-wrap" title="C"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><circle cx="16" cy="16" r="10" stroke="#00599C" stroke-width="1.4"/><path d="M21 11.5C19.3 9.9 17.8 9 16 9c-3.9 0-7 3.1-7 7s3.1 7 7 7c1.8 0 3.3-.7 5-2.5" stroke="#00599C" stroke-width="1.6" stroke-linecap="round" fill="none"/><text x="13" y="20" font-family="Arial Black,sans-serif" font-weight="900" font-size="10" fill="#00599C">C</text></svg><span>C</span></div>
-                    <div class="skill-icon-wrap" title="Cyber"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><path d="M16 4L5 9v6c0 6 4.5 11.6 11 13 6.5-1.4 11-7 11-13V9L16 4z" fill="none" stroke="#00ff88" stroke-width="1.5"/><path d="M11.5 16.5l3 3 6-6" stroke="#00ff88" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Cyber</span></div>
+                    <div class="skill-icon-wrap" title="Cyber"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#0d1117"/><path d="M16 4L5 9v6c0 6 4.5 11.6 11 13 6.5-1.4 11-7 11-13V9L16 4z" fill="none" stroke="#00ff88" stroke-width="1.5"/><path d="M11.5 16.5l3 3 6-6" stroke="#00ff88" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Защита</span></div>
                     <div class="skill-icon-wrap" title="Unity"><svg width="34" height="34" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="5" fill="#1a1a1a"/><path d="M16 4l10.4 6v12L16 28 5.6 22V10L16 4z" fill="none" stroke="#fff" stroke-width="1.3"/><text x="10.5" y="21" font-family="Arial Black,sans-serif" font-weight="900" font-size="11" fill="#fff">U</text></svg><span>Unity</span></div>
                 </div>
             </div>
-            <div class="team-card"><div class="card-num">003</div><h3>Design Team</h3><p class="role">Дизайн</p><p>Креативные умы, превращающие идеи в визуальные шедевры.</p></div>
-            <div class="team-card"><div class="card-num">004</div><h3>Security Team</h3><p class="role">Безопасность</p><p>Эксперты по кибербезопасности, защищающие ваши данные.</p></div>
+            <div class="team-card"><div class="card-num">003</div><h3>Дизайн</h3><p class="role">Дизайн</p><p>Креативные умы, превращающие идеи в визуальные шедевры.</p></div>
+            <div class="team-card"><div class="card-num">004</div><h3>Безопасность</h3><p class="role">Безопасность</p><p>Эксперты по кибербезопасности, защищающие ваши данные.</p></div>
         </div>
         <div class="accordion">
             <div class="acc-item">
@@ -372,9 +371,9 @@ HTML_PAGE = '''
         <div class="skills-layout">
             <div class="skill-cards">
                 <div class="skill-card"><div class="skill-card-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><rect x="3" y="5" width="30" height="8" rx="1" stroke="#00d4ff" stroke-width="1.2"/><rect x="3" y="16" width="30" height="8" rx="1" stroke="#00d4ff" stroke-width="1.2"/><circle cx="28" cy="9" r="2" fill="#00ff88"/><circle cx="28" cy="20" r="2" fill="#00ff88"/><line x1="8" y1="9" x2="20" y2="9" stroke="#00d4ff" stroke-width="1" opacity="0.5"/><line x1="8" y1="20" x2="20" y2="20" stroke="#00d4ff" stroke-width="1" opacity="0.5"/><path d="M18 27 L18 31" stroke="#00ff88" stroke-width="1.2"/><path d="M14 31 L22 31" stroke="#00ff88" stroke-width="1.2" stroke-linecap="round"/></svg></div><h4>Аудит серверов</h4><p>Настройка, аудит безопасности серверов и сетей.</p></div>
-                <div class="skill-card"><div class="skill-card-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M18 3 L31 8 L31 18 C31 25 25 31 18 33 C11 31 5 25 5 18 L5 8 Z" stroke="#00d4ff" stroke-width="1.2" fill="none"/><circle cx="18" cy="17" r="4" stroke="#00ff88" stroke-width="1"/><line x1="18" y1="13" x2="18" y2="8" stroke="#00ff88" stroke-width="1" stroke-dasharray="2 2"/><line x1="22" y1="17" x2="27" y2="17" stroke="#00ff88" stroke-width="1" stroke-dasharray="2 2"/><line x1="18" y1="21" x2="18" y2="26" stroke="#00ff88" stroke-width="1" stroke-dasharray="2 2"/><line x1="14" y1="17" x2="9" y2="17" stroke="#00ff88" stroke-width="1" stroke-dasharray="2 2"/></svg></div><h4>VPN &amp; Proxy</h4><p>Создание VPN/proxy серверов с подбором локаций и без логов.</p></div>
-                <div class="skill-card"><div class="skill-card-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><rect x="2" y="6" width="32" height="24" rx="1" stroke="#00d4ff" stroke-width="1.2"/><polyline points="10,14 6,18 10,22" stroke="#00ff88" stroke-width="1.5" stroke-linecap="round"/><polyline points="26,14 30,18 26,22" stroke="#00ff88" stroke-width="1.5" stroke-linecap="round"/><line x1="20" y1="12" x2="16" y2="24" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round"/></svg></div><h4>Web Development</h4><p>Full-stack разработка современных веб-приложений.</p></div>
-                <div class="skill-card"><div class="skill-card-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><rect x="3" y="10" width="30" height="18" rx="4" stroke="#00d4ff" stroke-width="1.2"/><line x1="13" y1="16" x2="13" y2="22" stroke="#00ff88" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="19" x2="16" y2="19" stroke="#00ff88" stroke-width="1.5" stroke-linecap="round"/><circle cx="24" cy="17" r="1.5" fill="#00d4ff"/><circle cx="27" cy="21" r="1.5" fill="#00d4ff"/><circle cx="21" cy="21" r="1.5" fill="#00d4ff"/></svg></div><h4>Game Development</h4><p>Разработка игр и интерактивных приложений.</p></div>
+                <div class="skill-card"><div class="skill-card-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M18 3 L31 8 L31 18 C31 25 25 31 18 33 C11 31 5 25 5 18 L5 8 Z" stroke="#00d4ff" stroke-width="1.2" fill="none"/><circle cx="18" cy="17" r="4" stroke="#00ff88" stroke-width="1"/><line x1="18" y1="13" x2="18" y2="8" stroke="#00ff88" stroke-width="1" stroke-dasharray="2 2"/><line x1="22" y1="17" x2="27" y2="17" stroke="#00ff88" stroke-width="1" stroke-dasharray="2 2"/><line x1="18" y1="21" x2="18" y2="26" stroke="#00ff88" stroke-width="1" stroke-dasharray="2 2"/><line x1="14" y1="17" x2="9" y2="17" stroke="#00ff88" stroke-width="1" stroke-dasharray="2 2"/></svg></div><h4>VPN и Прокси</h4><p>Создание VPN/proxy серверов с подбором локаций и без логов.</p></div>
+                <div class="skill-card"><div class="skill-card-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><rect x="2" y="6" width="32" height="24" rx="1" stroke="#00d4ff" stroke-width="1.2"/><polyline points="10,14 6,18 10,22" stroke="#00ff88" stroke-width="1.5" stroke-linecap="round"/><polyline points="26,14 30,18 26,22" stroke="#00ff88" stroke-width="1.5" stroke-linecap="round"/><line x1="20" y1="12" x2="16" y2="24" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round"/></svg></div><h4>Веб-разработка</h4><p>Full-stack разработка современных веб-приложений.</p></div>
+                <div class="skill-card"><div class="skill-card-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><rect x="3" y="10" width="30" height="18" rx="4" stroke="#00d4ff" stroke-width="1.2"/><line x1="13" y1="16" x2="13" y2="22" stroke="#00ff88" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="19" x2="16" y2="19" stroke="#00ff88" stroke-width="1.5" stroke-linecap="round"/><circle cx="24" cy="17" r="1.5" fill="#00d4ff"/><circle cx="27" cy="21" r="1.5" fill="#00d4ff"/><circle cx="21" cy="21" r="1.5" fill="#00d4ff"/></svg></div><h4>Разработка игр</h4><p>Разработка игр и интерактивных приложений.</p></div>
                 <div class="skill-card"><div class="skill-card-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="14" r="8" stroke="#00d4ff" stroke-width="1.2"/><circle cx="18" cy="14" r="3" fill="#00ff88" opacity="0.4"/><line x1="18" y1="22" x2="18" y2="33" stroke="#00d4ff" stroke-width="1.2"/><line x1="12" y1="28" x2="24" y2="28" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round"/><circle cx="11" cy="9" r="1.5" fill="#00ff88"/><circle cx="25" cy="9" r="1.5" fill="#00ff88"/></svg></div><h4>UI/UX &amp; Graphic</h4><p>Дизайн интерфейсов, аватарки, логотипы, брендинг.</p></div>
                 <div class="skill-card"><div class="skill-card-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><rect x="8" y="12" width="20" height="16" rx="2" stroke="#00d4ff" stroke-width="1.2"/><circle cx="14" cy="20" r="2" stroke="#00ff88" stroke-width="1"/><circle cx="22" cy="20" r="2" stroke="#00ff88" stroke-width="1"/><line x1="18" y1="12" x2="18" y2="7" stroke="#00d4ff" stroke-width="1.2"/><circle cx="18" cy="6" r="1.5" fill="#00d4ff"/><line x1="11" y1="28" x2="9" y2="32" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round"/><line x1="25" y1="28" x2="27" y2="32" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round"/></svg></div><h4>Боты &amp; Парсеры</h4><p>Telegram-боты, автоматизация, парсеры данных.</p></div>
             </div>
@@ -385,7 +384,7 @@ HTML_PAGE = '''
 <section id="contact">
     <div class="container">
         <div class="section-label">03 / Контакт</div>
-        <h2 class="section-title">Заказать услугу &amp; <span class="accent">Вступить</span></h2>
+        <h2 class="section-title">Заказать услугу &amp; <span class="accent">Вступить в команду</span></h2>
         <div class="forms-grid">
 
             <!-- SERVICES FORM -->
@@ -398,14 +397,14 @@ HTML_PAGE = '''
                         <div class="custom-select" id="csService">
                             <div class="custom-select-trigger"><span class="custom-select-value">Выберите услугу</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
                             <div class="custom-select-dropdown">
-                                <div class="custom-select-option" data-value="website">🌐 Сайт / Лендинг</div>
-                                <div class="custom-select-option" data-value="bot">🤖 Telegram-бот / Автоматизация</div>
-                                <div class="custom-select-option" data-value="security">🔐 Аудит безопасности</div>
-                                <div class="custom-select-option" data-value="vpn">🛡 VPN / Proxy сервер</div>
-                                <div class="custom-select-option" data-value="design">🎨 UI/UX / Графика / Брендинг</div>
-                                <div class="custom-select-option" data-value="osint">🔍 OSINT / Разведка</div>
-                                <div class="custom-select-option" data-value="gamedev">🎮 Game Development</div>
-                                <div class="custom-select-option" data-value="other">⚙️ Другое</div>
+                                <div class="custom-select-option" data-value="website"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="vertical-align:middle;margin-right:6px"><circle cx="8" cy="8" r="7" stroke="#00d4ff" stroke-width="1.2"/><ellipse cx="8" cy="8" rx="7" ry="3" stroke="#00d4ff" stroke-width="1.2"/><line x1="8" y1="1" x2="8" y2="15" stroke="#00d4ff" stroke-width="1.2"/><line x1="1" y1="8" x2="15" y2="8" stroke="#00d4ff" stroke-width="1.2"/></svg>Сайт / Лендинг</div>
+                                <div class="custom-select-option" data-value="bot"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="vertical-align:middle;margin-right:6px"><rect x="3" y="5" width="10" height="8" rx="2" stroke="#00d4ff" stroke-width="1.2"/><circle cx="6" cy="9" r="1" fill="#00ff88"/><circle cx="10" cy="9" r="1" fill="#00ff88"/><line x1="8" y1="5" x2="8" y2="2" stroke="#00d4ff" stroke-width="1.2"/><circle cx="8" cy="2" r="1" fill="#00d4ff"/></svg>Telegram-бот / Автоматизация</div>
+                                <div class="custom-select-option" data-value="security"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="vertical-align:middle;margin-right:6px"><path d="M8 1L2 4v4c0 3.5 2.5 6.5 6 7 3.5-.5 6-3.5 6-7V4L8 1z" stroke="#00ff88" stroke-width="1.2"/><path d="M5.5 8l2 2 3-3" stroke="#00ff88" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Аудит безопасности</div>
+                                <div class="custom-select-option" data-value="vpn"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="vertical-align:middle;margin-right:6px"><rect x="4" y="7" width="8" height="7" rx="1" stroke="#00d4ff" stroke-width="1.2"/><path d="M6 7V5a2 2 0 014 0v2" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="10.5" r="1" fill="#00d4ff"/></svg>VPN / Прокси сервер</div>
+                                <div class="custom-select-option" data-value="design"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="vertical-align:middle;margin-right:6px"><circle cx="8" cy="8" r="6" stroke="#00d4ff" stroke-width="1.2"/><circle cx="5" cy="7" r="1" fill="#f44"/><circle cx="8" cy="5" r="1" fill="#ff0"/><circle cx="11" cy="7" r="1" fill="#4f4"/><circle cx="9.5" cy="10" r="1" fill="#44f"/></svg>UI/UX / Графика / Брендинг</div>
+
+                                <div class="custom-select-option" data-value="gamedev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="vertical-align:middle;margin-right:6px"><rect x="1" y="5" width="14" height="8" rx="3" stroke="#00d4ff" stroke-width="1.2"/><line x1="6" y1="7" x2="6" y2="11" stroke="#00ff88" stroke-width="1.3" stroke-linecap="round"/><line x1="4" y1="9" x2="8" y2="9" stroke="#00ff88" stroke-width="1.3" stroke-linecap="round"/><circle cx="11" cy="8" r="0.8" fill="#00d4ff"/><circle cx="13" cy="10" r="0.8" fill="#00d4ff"/></svg>Разработка игр</div>
+                                <div class="custom-select-option" data-value="other"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="vertical-align:middle;margin-right:6px"><circle cx="8" cy="8" r="2.5" stroke="#00d4ff" stroke-width="1.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round"/></svg>Другое</div>
                             </div>
                         </div>
                         <input type="hidden" id="serviceType">
@@ -414,11 +413,11 @@ HTML_PAGE = '''
                         <div class="custom-select" id="csBudget">
                             <div class="custom-select-trigger"><span class="custom-select-value">Укажите диапазон</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
                             <div class="custom-select-dropdown">
-                                <div class="custom-select-option" data-value="lt50">До $50</div>
-                                <div class="custom-select-option" data-value="50-150">$50 — $150</div>
-                                <div class="custom-select-option" data-value="150-500">$150 — $500</div>
-                                <div class="custom-select-option" data-value="500-1500">$500 — $1500</div>
-                                <div class="custom-select-option" data-value="gt1500">$1500+</div>
+                                <div class="custom-select-option" data-value="lt50">До 5 000 руб.</div>
+                                <div class="custom-select-option" data-value="50-150">5 000 — 15 000 руб.</div>
+                                <div class="custom-select-option" data-value="150-500">15 000 — 50 000 руб.</div>
+                                <div class="custom-select-option" data-value="500-1500">50 000 — 150 000 руб.</div>
+                                <div class="custom-select-option" data-value="gt1500">150 000+ руб.</div>
                                 <div class="custom-select-option" data-value="discuss">Обсудим индивидуально</div>
                             </div>
                         </div>
@@ -428,7 +427,7 @@ HTML_PAGE = '''
                         <div class="custom-select" id="csDeadline">
                             <div class="custom-select-trigger"><span class="custom-select-value">Когда нужно?</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
                             <div class="custom-select-dropdown">
-                                <div class="custom-select-option" data-value="asap">🔥 ASAP (срочно)</div>
+                                <div class="custom-select-option" data-value="asap"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="vertical-align:middle;margin-right:6px"><path d="M8 2c0 3-3 4-3 7a3 3 0 006 0c0-3-3-4-3-7z" stroke="#ff6b35" stroke-width="1.2"/><path d="M8 10c0 1-1 1.5-1 2.5a1 1 0 002 0C9 11.5 8 11 8 10z" fill="#ff6b35"/></svg>Срочно</div>
                                 <div class="custom-select-option" data-value="week">До 1 недели</div>
                                 <div class="custom-select-option" data-value="2weeks">1–2 недели</div>
                                 <div class="custom-select-option" data-value="month">До месяца</div>
@@ -461,22 +460,21 @@ HTML_PAGE = '''
                 <div class="form-panel-sub">Только сильные — рассматриваем в течение 24 ч</div>
                 <form id="joinForm">
                     <div class="fg"><label>Telegram</label><input type="text" id="joinUsername" placeholder="@username" readonly style="opacity:0.6;cursor:default;"></div>
-                    <div class="fg"><label>Имя / Псевдоним *</label><input type="text" id="fullName" required placeholder="Иван / CyberDev"></div>
+                    <div class="fg"><label>Имя / Псевдоним *</label><input type="text" id="fullName" required placeholder="Иван / Псевдоним"></div>
                     <div class="fg"><label>Специализация *</label>
                         <div class="custom-select" id="csSpec">
                             <div class="custom-select-trigger"><span class="custom-select-value">Выберите роль</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
                             <div class="custom-select-dropdown">
-                                <div class="custom-select-option" data-value="frontend">Frontend Developer</div>
-                                <div class="custom-select-option" data-value="backend">Backend Developer</div>
-                                <div class="custom-select-option" data-value="fullstack">Full-Stack Developer</div>
-                                <div class="custom-select-option" data-value="mobile">Mobile Developer</div>
-                                <div class="custom-select-option" data-value="designer">UI/UX Designer</div>
-                                <div class="custom-select-option" data-value="security">Security Specialist</div>
-                                <div class="custom-select-option" data-value="devops">DevOps Engineer</div>
-                                <div class="custom-select-option" data-value="ai">AI/ML Engineer</div>
-                                <div class="custom-select-option" data-value="gamedev">Game Developer</div>
-                                <div class="custom-select-option" data-value="osint">OSINT Analyst</div>
-                            </div>
+                                <div class="custom-select-option" data-value="frontend">Фронтенд разработчик</div>
+                                <div class="custom-select-option" data-value="backend">Бэкенд разработчик</div>
+                                <div class="custom-select-option" data-value="fullstack">Фулстек разработчик</div>
+                                <div class="custom-select-option" data-value="mobile">Мобильный разработчик</div>
+                                <div class="custom-select-option" data-value="designer">UI/UX Дизайнер</div>
+                                <div class="custom-select-option" data-value="security">Специалист по безопасности</div>
+                                <div class="custom-select-option" data-value="devops">DevOps инженер</div>
+                                <div class="custom-select-option" data-value="ai">AI/ML инженер</div>
+                                <div class="custom-select-option" data-value="gamedev">Разработчик игр</div>
+</div>
                         </div>
                         <input type="hidden" id="specialization">
                     </div>
@@ -494,8 +492,8 @@ HTML_PAGE = '''
                         <div class="custom-select" id="csAvail">
                             <div class="custom-select-trigger"><span class="custom-select-value">Формат работы</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
                             <div class="custom-select-dropdown">
-                                <div class="custom-select-option" data-value="fulltime">Full-time</div>
-                                <div class="custom-select-option" data-value="parttime">Part-time</div>
+                                <div class="custom-select-option" data-value="fulltime">Полная занятость</div>
+                                <div class="custom-select-option" data-value="parttime">Частичная занятость</div>
                                 <div class="custom-select-option" data-value="project">По проектам</div>
                                 <div class="custom-select-option" data-value="weekend">Подработка / выходные</div>
                             </div>
@@ -525,10 +523,10 @@ HTML_PAGE = '''
                         <div class="custom-select" id="csRate">
                             <div class="custom-select-trigger"><span class="custom-select-value">$/час или fix</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
                             <div class="custom-select-dropdown">
-                                <div class="custom-select-option" data-value="lt10">До $10/ч</div>
-                                <div class="custom-select-option" data-value="10-25">$10–25/ч</div>
-                                <div class="custom-select-option" data-value="25-50">$25–50/ч</div>
-                                <div class="custom-select-option" data-value="50+">$50+/ч</div>
+                                <div class="custom-select-option" data-value="lt10">До 1 000 руб/ч</div>
+                                <div class="custom-select-option" data-value="10-25">1 000 — 2 500 руб/ч</div>
+                                <div class="custom-select-option" data-value="25-50">2 500 — 5 000 руб/ч</div>
+                                <div class="custom-select-option" data-value="50+">5 000+ руб/ч</div>
                                 <div class="custom-select-option" data-value="fix">Фикс за проект</div>
                                 <div class="custom-select-option" data-value="discuss">Обсуждаем</div>
                             </div>
@@ -547,7 +545,7 @@ HTML_PAGE = '''
 </section>
 <footer>
     <a href="#hero" class="logo-svg"><svg width="22" height="22" viewBox="0 0 28 28" fill="none"><defs><radialGradient id="sphereGradF" cx="38%" cy="35%" r="60%"><stop offset="0%" stop-color="#00ff88" stop-opacity="0.35"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0.05"/></radialGradient></defs><circle cx="14" cy="14" r="12" stroke="#00ff88" stroke-width="1.2" fill="url(#sphereGradF)"/><ellipse cx="14" cy="14" rx="12" ry="4.5" stroke="#00d4ff" stroke-width="0.8" fill="none" opacity="0.7"/><ellipse cx="14" cy="14" rx="4.5" ry="12" stroke="#00d4ff" stroke-width="0.8" fill="none" opacity="0.5"/><circle cx="14" cy="14" r="2" fill="#00ff88"/></svg><span class="logo-text">THIN LUCID</span></a>
-    <p>© 2025 Thin Lucid Agency. All rights reserved.</p>
+    <p>© 2025 Thin Lucid Agency. Все права защищены.</p>
 </footer>
 <div class="overlay" id="overlay"></div>
 <div class="success-msg" id="successMsg"><h2>Заявка отправлена</h2><p>Мы свяжемся с вами в ближайшее время.</p></div>
@@ -593,9 +591,25 @@ var TG_CHAT='-1003846908224';
 function sendToTelegram(text,btn){btn.disabled=true;btn.querySelector('span').textContent='Отправка...';return fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_CHAT,text:text,parse_mode:'HTML'})}).then(function(r){return r.json();}).then(function(data){btn.disabled=false;btn.querySelector('span').textContent='Отправить';if(data.ok){if(tg){tg.HapticFeedback.notificationOccurred('success');}showSuccess();}else{alert('Ошибка: '+(data.description||'попробуйте ещё раз'));}}).catch(function(){btn.disabled=false;btn.querySelector('span').textContent='Отправить';alert('Ошибка сети. Проверьте соединение.');});}
 function showSuccess(){document.getElementById('overlay').classList.add('show');document.getElementById('successMsg').classList.add('show');setTimeout(function(){document.getElementById('overlay').classList.remove('show');document.getElementById('successMsg').classList.remove('show');},3000);}
 var cf=document.getElementById('contactForm');
-if(cf)cf.addEventListener('submit',function(e){e.preventDefault();var username=document.getElementById('username').value.trim(),serviceType=document.getElementById('serviceType').value||'—',budgetRange=document.getElementById('budgetRange').value||'—',deadlinePref=document.getElementById('deadlinePref').value||'—',leadSource=document.getElementById('leadSource').value||'—',message=document.getElementById('message').value.trim();var text='📩 <b>Новая заявка — Услуги</b>\n\n👤 <b>Telegram:</b> '+username+'\n🛠 <b>Услуга:</b> '+serviceType+'\n💰 <b>Бюджет:</b> '+budgetRange+'\n⏱ <b>Дедлайн:</b> '+deadlinePref+'\n📣 <b>Источник:</b> '+leadSource+'\n\n📝 <b>Описание:</b>\n'+message;var btn=cf.querySelector('button[type="submit"]');sendToTelegram(text,btn).then(function(){cf.reset();});});
+if(cf)cf.addEventListener('submit',function(e){e.preventDefault();var username=document.getElementById('username').value.trim(),serviceType=document.getElementById('serviceType').value||'—',budgetRange=document.getElementById('budgetRange').value||'—',deadlinePref=document.getElementById('deadlinePref').value||'—',leadSource=document.getElementById('leadSource').value||'—',message=document.getElementById('message').value.trim();var text='<b>Новая заявка — Услуги</b>\\n\\n <b>Telegram:</b> '+username+'\\n<b>Услуга:</b> '+serviceType+'\\n<b>Бюджет:</b> '+budgetRange+'\\n<b>Дедлайн:</b> '+deadlinePref+'\\n<b>Источник:</b> '+leadSource+'\\n\\n <b>Описание:</b>\\n'+message;var btn=cf.querySelector('button[type="submit"]');sendToTelegram(text,btn).then(function(){cf.reset();});});
 var jf=document.getElementById('joinForm');
-if(jf)jf.addEventListener('submit',function(e){e.preventDefault();var username=document.getElementById('joinUsername').value.trim(),fullName=document.getElementById('fullName').value.trim(),spec=document.getElementById('specialization').value||'—',level=document.getElementById('levelField').value||'—',exp=document.getElementById('experience').value||'—',avail=document.getElementById('availability').value||'—',rate=document.getElementById('rateField').value||'—',tz=document.getElementById('tzField').value||'—',portfolio=document.getElementById('portfolio').value.trim(),socials=document.getElementById('socials').value.trim()||'—',skills=document.getElementById('skillsField').value.trim(),motivation=document.getElementById('motivation').value.trim();var text='🚀 <b>Новая заявка — Команда</b>\n\n👤 <b>Telegram:</b> '+username+'\n📛 <b>Имя:</b> '+fullName+'\n🛠 <b>Роль:</b> '+spec+'\n⭐ <b>Уровень:</b> '+level+'\n📅 <b>Опыт:</b> '+exp+' лет\n🕐 <b>Доступность:</b> '+avail+'\n💵 <b>Ставка:</b> '+rate+'\n🌍 <b>Часовой пояс:</b> '+tz+'\n🔗 <b>Портфолио:</b> '+portfolio+'\n🌐 <b>Соцсети:</b> '+socials+'\n\n💻 <b>Навыки:</b>\n'+skills+'\n\n✍️ <b>Мотивация:</b>\n'+motivation;var btn=jf.querySelector('button[type="submit"]');sendToTelegram(text,btn).then(function(){jf.reset();document.getElementById('levelField').value='';document.querySelectorAll('.level-btn').forEach(function(b){b.classList.remove('active');});});});
+if(jf)jf.addEventListener('submit',function(e){
+  e.preventDefault();
+  var tgUser=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user;
+  var userId=tgUser?tgUser.id:null;
+  var username=document.getElementById('joinUsername').value.trim(),fullName=document.getElementById('fullName').value.trim(),spec=document.getElementById('specialization').value||'—',level=document.getElementById('levelField').value||'—',exp=document.getElementById('experience').value||'—',avail=document.getElementById('availability').value||'—',rate=document.getElementById('rateField').value||'—',tz=document.getElementById('tzField').value||'—',portfolio=document.getElementById('portfolio').value.trim(),socials=document.getElementById('socials').value.trim()||'—',skills=document.getElementById('skillsField').value.trim(),motivation=document.getElementById('motivation').value.trim();
+  var text='<b>Новая заявка — Команда</b>\n\n<b>Telegram:</b> '+username+'\n<b>Имя:</b> '+fullName+'\n<b>Роль:</b> '+spec+'\n<b>Уровень:</b> '+level+'\n<b>Опыт:</b> '+exp+' лет\n<b>Доступность:</b> '+avail+'\n<b>Ставка:</b> '+rate+'\n<b>Часовой пояс:</b> '+tz+'\n<b>Портфолио:</b> '+portfolio+'\n<b>Соцсети:</b> '+socials+'\n\n<b>Навыки:</b>\n'+skills+'\n\n<b>Мотивация:</b>\n'+motivation;
+  var btn=jf.querySelector('button[type="submit"]');
+  btn.disabled=true;btn.querySelector('span').textContent='Отправка...';
+  fetch('/join_apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,text:text})})
+    .then(function(r){return r.text();})
+    .then(function(res){
+      btn.disabled=false;btn.querySelector('span').textContent='Подать заявку';
+      if(res==='ok'){if(tg)tg.HapticFeedback.notificationOccurred('success');showSuccess();jf.reset();document.getElementById('levelField').value='';document.querySelectorAll('.level-btn').forEach(function(b){b.classList.remove('active');});}
+      else{alert('Ошибка при отправке, попробуйте ещё раз');}
+    })
+    .catch(function(){btn.disabled=false;btn.querySelector('span').textContent='Подать заявку';alert('Ошибка сети.');});
+});
 });
 </script>
 </body>
@@ -696,6 +710,78 @@ async def cb_join(callback: CallbackQuery):
         ]])
     )
 
+# ── ОБРАБОТКА ЗАЯВОК В КОМАНДУ ───────────────────────────────────
+@dp.callback_query(F.data.startswith("approve:"))
+async def cb_approve(callback: CallbackQuery):
+    user_id = int(callback.data.split(":")[1])
+    await callback.answer("✅ Заявка одобрена", show_alert=False)
+    # Редактируем сообщение в группе — убираем кнопки
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+        await callback.message.reply("✅ <b>Одобрено</b> — " + callback.from_user.first_name)
+    except Exception:
+        pass
+    # Пишем соискателю
+    try:
+        await bot.send_message(
+            chat_id=user_id,
+            text=(
+                "✅ <b>Ваша заявка одобрена!</b>\n\n"
+                "Поздравляем — вы нам подходите.\n"
+                "Ожидайте, с вами скоро свяжутся."
+            )
+        )
+    except Exception as e:
+        logging.warning(f"Не удалось написать пользователю {user_id}: {e}")
+
+@dp.callback_query(F.data.startswith("reject:"))
+async def cb_reject(callback: CallbackQuery):
+    user_id = int(callback.data.split(":")[1])
+    await callback.answer("❌ Заявка отклонена", show_alert=False)
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+        await callback.message.reply("❌ <b>Отклонено</b> — " + callback.from_user.first_name)
+    except Exception:
+        pass
+    try:
+        await bot.send_message(
+            chat_id=user_id,
+            text=(
+                "😔 <b>Сожалеем, но вы нам не подходите.</b>\n\n"
+                "Спасибо за интерес к Thin Lucid Agency.\n"
+                "Желаем удачи в поисках!"
+            )
+        )
+    except Exception as e:
+        logging.warning(f"Не удалось написать пользователю {user_id}: {e}")
+
+# ── ENDPOINT ДЛЯ ПРИЁМА ЗАЯВОК ИЗ MINI APP ───────────────────────
+async def handle_join_apply(request):
+    """Принимает JSON с заявкой + user_id, шлёт сообщение в группу с кнопками"""
+    try:
+        data = await request.json()
+        user_id = data.get("user_id")
+        text = data.get("text", "")
+
+        if not user_id or not text:
+            return web.Response(status=400, text="bad request")
+
+        kb = InlineKeyboardMarkup(inline_keyboard=[[
+            InlineKeyboardButton(text="✅ Принять", callback_data=f"approve:{user_id}"),
+            InlineKeyboardButton(text="❌ Отказать", callback_data=f"reject:{user_id}"),
+        ]])
+
+        await bot.send_message(
+            chat_id=TG_CHAT,
+            text=text,
+            parse_mode="HTML",
+            reply_markup=kb
+        )
+        return web.Response(text="ok")
+    except Exception as e:
+        logging.error(f"handle_join_apply error: {e}")
+        return web.Response(status=500, text=str(e))
+
 # ── WEB SERVER (всё из памяти, внешних файлов не нужно) ──────────
 async def handle_index(request):
     return web.Response(text=HTML_PAGE, content_type="text/html", charset="utf-8")
@@ -703,6 +789,7 @@ async def handle_index(request):
 async def start_web():
     app = web.Application()
     app.router.add_get("/", handle_index)
+    app.router.add_post("/join_apply", handle_join_apply)
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, "0.0.0.0", PORT)
