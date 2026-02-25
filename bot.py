@@ -236,6 +236,10 @@ HTML_PAGE = '''
         .tech-logo-item:hover span { color: var(--g); }
         #contact { background: var(--card); }
         .forms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .level-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .level-btn { flex: 1; padding: 0.65rem 0.5rem; background: transparent; border: 1px solid rgba(255,255,255,0.08); color: var(--muted); font-family: 'Space Mono', monospace; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s; }
+        .level-btn:hover { border-color: var(--g); color: var(--g); }
+        .level-btn.active { background: var(--g); border-color: var(--g); color: #000; }
         .form-panel { border: 1px solid var(--line); padding: 2.5rem; position: relative; overflow: hidden; }
         .form-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--g), var(--c)); }
         .form-panel-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 0.4rem; letter-spacing: -0.01em; }
@@ -381,46 +385,161 @@ HTML_PAGE = '''
 <section id="contact">
     <div class="container">
         <div class="section-label">03 / Контакт</div>
-        <h2 class="section-title">Написать нам &amp; <span class="accent">Вступить</span></h2>
+        <h2 class="section-title">Заказать услугу &amp; <span class="accent">Вступить</span></h2>
         <div class="forms-grid">
+
+            <!-- SERVICES FORM -->
             <div class="form-panel" id="contact-panel">
-                <div class="form-panel-title">Связаться</div>
-                <div class="form-panel-sub">Расскажите о вашем запросе</div>
+                <div class="form-panel-title">Заказать услугу</div>
+                <div class="form-panel-sub">Опишите задачу — ответим в течение нескольких часов</div>
                 <form id="contactForm">
-                    <div class="fg"><label>Telegram Username</label><input type="text" id="username" placeholder="@username" readonly style="opacity:0.6;cursor:default;"></div>
-                    <div class="fg"><label>Сообщение *</label><textarea id="message" required placeholder="Опишите ваш запрос..."></textarea></div>
-                    <button type="submit" class="submit-btn"><span>Отправить</span></button>
-                </form>
-            </div>
-            <div class="form-panel" id="join">
-                <div class="form-panel-title">Вступить в команду</div>
-                <div class="form-panel-sub">Присоединяйтесь к элите</div>
-                <form id="joinForm">
-                    <div class="fg"><label>Telegram Username</label><input type="text" id="joinUsername" placeholder="@username" readonly style="opacity:0.6;cursor:default;"></div>
-                    <div class="fg"><label>Полное имя *</label><input type="text" id="fullName" required placeholder="Иван Иванов"></div>
-                    <div class="fg"><label>Специализация *</label>
-                        <div class="select-wrapper">
-                            <select id="specialization" required><option value="" disabled selected>Выберите специализацию</option><option value="frontend">Frontend Developer</option><option value="backend">Backend Developer</option><option value="fullstack">Full-Stack Developer</option><option value="mobile">Mobile Developer</option><option value="designer">UI/UX Designer</option><option value="security">Security Specialist</option><option value="devops">DevOps Engineer</option><option value="ai">AI/ML Engineer</option></select>
-                            <div class="custom-select" id="customSpecSelect">
-                                <div class="custom-select-trigger"><span class="custom-select-value">Выберите специализацию</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
-                                <div class="custom-select-dropdown">
-                                    <div class="custom-select-option" data-value="frontend">Frontend Developer</div>
-                                    <div class="custom-select-option" data-value="backend">Backend Developer</div>
-                                    <div class="custom-select-option" data-value="fullstack">Full-Stack Developer</div>
-                                    <div class="custom-select-option" data-value="mobile">Mobile Developer</div>
-                                    <div class="custom-select-option" data-value="designer">UI/UX Designer</div>
-                                    <div class="custom-select-option" data-value="security">Security Specialist</div>
-                                    <div class="custom-select-option" data-value="devops">DevOps Engineer</div>
-                                    <div class="custom-select-option" data-value="ai">AI/ML Engineer</div>
-                                </div>
+                    <div class="fg"><label>Telegram</label><input type="text" id="username" placeholder="@username" readonly style="opacity:0.6;cursor:default;"></div>
+                    <div class="fg"><label>Тип услуги *</label>
+                        <div class="custom-select" id="csService">
+                            <div class="custom-select-trigger"><span class="custom-select-value">Выберите услугу</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
+                            <div class="custom-select-dropdown">
+                                <div class="custom-select-option" data-value="website">🌐 Сайт / Лендинг</div>
+                                <div class="custom-select-option" data-value="bot">🤖 Telegram-бот / Автоматизация</div>
+                                <div class="custom-select-option" data-value="security">🔐 Аудит безопасности</div>
+                                <div class="custom-select-option" data-value="vpn">🛡 VPN / Proxy сервер</div>
+                                <div class="custom-select-option" data-value="design">🎨 UI/UX / Графика / Брендинг</div>
+                                <div class="custom-select-option" data-value="osint">🔍 OSINT / Разведка</div>
+                                <div class="custom-select-option" data-value="gamedev">🎮 Game Development</div>
+                                <div class="custom-select-option" data-value="other">⚙️ Другое</div>
                             </div>
                         </div>
+                        <input type="hidden" id="serviceType">
                     </div>
-                    <div class="fg"><label>Опыт (лет) *</label><input type="number" id="experience" required min="0" placeholder="3"></div>
-                    <div class="fg"><label>Портфолио *</label><input type="url" id="portfolio" required placeholder="https://github.com/username"></div>
-                    <div class="fg"><label>Основные навыки *</label><textarea id="skillsField" required placeholder="React, Node.js, Docker..."></textarea></div>
-                    <div class="fg"><label>Мотивация *</label><textarea id="motivation" required placeholder="Расскажите о себе..."></textarea></div>
+                    <div class="fg"><label>Бюджет *</label>
+                        <div class="custom-select" id="csBudget">
+                            <div class="custom-select-trigger"><span class="custom-select-value">Укажите диапазон</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
+                            <div class="custom-select-dropdown">
+                                <div class="custom-select-option" data-value="lt50">До $50</div>
+                                <div class="custom-select-option" data-value="50-150">$50 — $150</div>
+                                <div class="custom-select-option" data-value="150-500">$150 — $500</div>
+                                <div class="custom-select-option" data-value="500-1500">$500 — $1500</div>
+                                <div class="custom-select-option" data-value="gt1500">$1500+</div>
+                                <div class="custom-select-option" data-value="discuss">Обсудим индивидуально</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="budgetRange">
+                    </div>
+                    <div class="fg"><label>Дедлайн</label>
+                        <div class="custom-select" id="csDeadline">
+                            <div class="custom-select-trigger"><span class="custom-select-value">Когда нужно?</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
+                            <div class="custom-select-dropdown">
+                                <div class="custom-select-option" data-value="asap">🔥 ASAP (срочно)</div>
+                                <div class="custom-select-option" data-value="week">До 1 недели</div>
+                                <div class="custom-select-option" data-value="2weeks">1–2 недели</div>
+                                <div class="custom-select-option" data-value="month">До месяца</div>
+                                <div class="custom-select-option" data-value="flexible">Гибко</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="deadlinePref">
+                    </div>
+                    <div class="fg"><label>Описание проекта *</label><textarea id="message" required placeholder="Что нужно сделать? Чем подробнее — тем точнее оценка..." style="min-height:120px;"></textarea></div>
+                    <div class="fg"><label>Как вы нас нашли?</label>
+                        <div class="custom-select" id="csSource">
+                            <div class="custom-select-trigger"><span class="custom-select-value">Источник</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
+                            <div class="custom-select-dropdown">
+                                <div class="custom-select-option" data-value="tg">Telegram</div>
+                                <div class="custom-select-option" data-value="ref">По рекомендации</div>
+                                <div class="custom-select-option" data-value="search">Поиск</div>
+                                <div class="custom-select-option" data-value="social">Соцсети</div>
+                                <div class="custom-select-option" data-value="other">Другое</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="leadSource">
+                    </div>
                     <button type="submit" class="submit-btn"><span>Отправить заявку</span></button>
+                </form>
+            </div>
+
+            <!-- JOIN FORM -->
+            <div class="form-panel" id="join">
+                <div class="form-panel-title">Вступить в команду</div>
+                <div class="form-panel-sub">Только сильные — рассматриваем в течение 24 ч</div>
+                <form id="joinForm">
+                    <div class="fg"><label>Telegram</label><input type="text" id="joinUsername" placeholder="@username" readonly style="opacity:0.6;cursor:default;"></div>
+                    <div class="fg"><label>Имя / Псевдоним *</label><input type="text" id="fullName" required placeholder="Иван / CyberDev"></div>
+                    <div class="fg"><label>Специализация *</label>
+                        <div class="custom-select" id="csSpec">
+                            <div class="custom-select-trigger"><span class="custom-select-value">Выберите роль</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
+                            <div class="custom-select-dropdown">
+                                <div class="custom-select-option" data-value="frontend">Frontend Developer</div>
+                                <div class="custom-select-option" data-value="backend">Backend Developer</div>
+                                <div class="custom-select-option" data-value="fullstack">Full-Stack Developer</div>
+                                <div class="custom-select-option" data-value="mobile">Mobile Developer</div>
+                                <div class="custom-select-option" data-value="designer">UI/UX Designer</div>
+                                <div class="custom-select-option" data-value="security">Security Specialist</div>
+                                <div class="custom-select-option" data-value="devops">DevOps Engineer</div>
+                                <div class="custom-select-option" data-value="ai">AI/ML Engineer</div>
+                                <div class="custom-select-option" data-value="gamedev">Game Developer</div>
+                                <div class="custom-select-option" data-value="osint">OSINT Analyst</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="specialization">
+                    </div>
+                    <div class="fg"><label>Уровень *</label>
+                        <div class="level-btns" id="levelBtns">
+                            <button type="button" class="level-btn" data-val="Junior">Junior</button>
+                            <button type="button" class="level-btn" data-val="Middle">Middle</button>
+                            <button type="button" class="level-btn" data-val="Senior">Senior</button>
+                            <button type="button" class="level-btn" data-val="Lead">Lead</button>
+                        </div>
+                        <input type="hidden" id="levelField">
+                    </div>
+                    <div class="fg"><label>Опыт (лет) *</label><input type="number" id="experience" required min="0" max="30" placeholder="3"></div>
+                    <div class="fg"><label>Доступность *</label>
+                        <div class="custom-select" id="csAvail">
+                            <div class="custom-select-trigger"><span class="custom-select-value">Формат работы</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
+                            <div class="custom-select-dropdown">
+                                <div class="custom-select-option" data-value="fulltime">Full-time</div>
+                                <div class="custom-select-option" data-value="parttime">Part-time</div>
+                                <div class="custom-select-option" data-value="project">По проектам</div>
+                                <div class="custom-select-option" data-value="weekend">Подработка / выходные</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="availability">
+                    </div>
+                    <div class="fg"><label>Часовой пояс *</label>
+                        <div class="custom-select" id="csTz">
+                            <div class="custom-select-trigger"><span class="custom-select-value">Ваш часовой пояс</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
+                            <div class="custom-select-dropdown">
+                                <div class="custom-select-option" data-value="UTC-5">UTC-5 (EST)</div>
+                                <div class="custom-select-option" data-value="UTC-4">UTC-4 (EDT)</div>
+                                <div class="custom-select-option" data-value="UTC+0">UTC+0 (Лондон)</div>
+                                <div class="custom-select-option" data-value="UTC+1">UTC+1 (Берлин, Варшава)</div>
+                                <div class="custom-select-option" data-value="UTC+2">UTC+2 (Киев, Рига)</div>
+                                <div class="custom-select-option" data-value="UTC+3">UTC+3 (Москва, Стамбул)</div>
+                                <div class="custom-select-option" data-value="UTC+4">UTC+4 (Баку, Дубай)</div>
+                                <div class="custom-select-option" data-value="UTC+5">UTC+5 (Ташкент)</div>
+                                <div class="custom-select-option" data-value="UTC+6">UTC+6 (Алматы)</div>
+                                <div class="custom-select-option" data-value="UTC+7">UTC+7 (Бангкок, Красноярск)</div>
+                                <div class="custom-select-option" data-value="UTC+8">UTC+8 (Пекин, Сингапур)</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="tzField">
+                    </div>
+                    <div class="fg"><label>Ожидаемая ставка</label>
+                        <div class="custom-select" id="csRate">
+                            <div class="custom-select-trigger"><span class="custom-select-value">$/час или fix</span><span class="custom-select-arrow"><svg viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg></span></div>
+                            <div class="custom-select-dropdown">
+                                <div class="custom-select-option" data-value="lt10">До $10/ч</div>
+                                <div class="custom-select-option" data-value="10-25">$10–25/ч</div>
+                                <div class="custom-select-option" data-value="25-50">$25–50/ч</div>
+                                <div class="custom-select-option" data-value="50+">$50+/ч</div>
+                                <div class="custom-select-option" data-value="fix">Фикс за проект</div>
+                                <div class="custom-select-option" data-value="discuss">Обсуждаем</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="rateField">
+                    </div>
+                    <div class="fg"><label>Портфолио / GitHub *</label><input type="text" id="portfolio" required placeholder="https://github.com/username"></div>
+                    <div class="fg"><label>Ссылки (соцсети, Behance, etc.)</label><input type="text" id="socials" placeholder="https://..."></div>
+                    <div class="fg"><label>Ключевые навыки *</label><textarea id="skillsField" required placeholder="Python, React, Docker, Burp Suite..."></textarea></div>
+                    <div class="fg"><label>Почему Thin Lucid? *</label><textarea id="motivation" required placeholder="Чем можете усилить команду? Что ищете?" style="min-height:100px;"></textarea></div>
+                    <button type="submit" class="submit-btn"><span>Подать заявку</span></button>
                 </form>
             </div>
         </div>
@@ -464,15 +583,19 @@ document.querySelectorAll('.acc-header').forEach(function(header){header.addEven
 })();
 var tg=window.Telegram&&window.Telegram.WebApp;
 if(tg){tg.ready();tg.expand();if(tg.colorScheme==='light'){document.documentElement.style.setProperty('--bg','#f0f0f5');document.documentElement.style.setProperty('--card','#ffffff');document.documentElement.style.setProperty('--txt','#1a1a2e');document.documentElement.style.setProperty('--muted','#888899');}var user=tg.initDataUnsafe&&tg.initDataUnsafe.user;if(user){var uname=user.username?'@'+user.username:(user.first_name+(user.last_name?' '+user.last_name:''));var uField=document.getElementById('username'),jField=document.getElementById('joinUsername'),fnField=document.getElementById('fullName');if(uField)uField.value=uname;if(jField)jField.value=uname;if(fnField&&!fnField.value)fnField.value=user.first_name+(user.last_name?' '+user.last_name:'');}}
-(function(){var cs=document.getElementById('customSpecSelect'),native=document.getElementById('specialization');if(!cs||!native)return;var trigger=cs.querySelector('.custom-select-trigger'),valueEl=cs.querySelector('.custom-select-value'),options=cs.querySelectorAll('.custom-select-option');trigger.addEventListener('click',function(e){e.stopPropagation();cs.classList.toggle('open');});options.forEach(function(opt){opt.addEventListener('click',function(){var val=opt.getAttribute('data-value'),text=opt.textContent.trim();options.forEach(function(o){o.classList.remove('selected');});opt.classList.add('selected');valueEl.textContent=text;trigger.classList.add('has-value');native.value=val;cs.classList.remove('open');});});document.addEventListener('click',function(){cs.classList.remove('open');});cs.addEventListener('click',function(e){e.stopPropagation();});})();
+(function(){
+  function initSelect(id,hiddenId){var cs=document.getElementById(id),hidden=document.getElementById(hiddenId);if(!cs)return;var trigger=cs.querySelector('.custom-select-trigger'),valueEl=cs.querySelector('.custom-select-value'),options=cs.querySelectorAll('.custom-select-option');trigger.addEventListener('click',function(e){e.stopPropagation();cs.classList.toggle('open');});options.forEach(function(opt){opt.addEventListener('click',function(){options.forEach(function(o){o.classList.remove('selected');});opt.classList.add('selected');valueEl.textContent=opt.textContent.trim();trigger.classList.add('has-value');if(hidden)hidden.value=opt.getAttribute('data-value');cs.classList.remove('open');});});document.addEventListener('click',function(){cs.classList.remove('open');});cs.addEventListener('click',function(e){e.stopPropagation();});}
+  initSelect('csService','serviceType');initSelect('csBudget','budgetRange');initSelect('csDeadline','deadlinePref');initSelect('csSource','leadSource');initSelect('csSpec','specialization');initSelect('csAvail','availability');initSelect('csRate','rateField');initSelect('csTz','tzField');
+  document.querySelectorAll('.level-btn').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.level-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');document.getElementById('levelField').value=btn.getAttribute('data-val');});});
+})();
 var TG_TOKEN='8759243252:AAGcMEARFHLaWpFDCghswusg2hbcjnBW9nw';
 var TG_CHAT='-1003846908224';
 function sendToTelegram(text,btn){btn.disabled=true;btn.querySelector('span').textContent='Отправка...';return fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_CHAT,text:text,parse_mode:'HTML'})}).then(function(r){return r.json();}).then(function(data){btn.disabled=false;btn.querySelector('span').textContent='Отправить';if(data.ok){if(tg){tg.HapticFeedback.notificationOccurred('success');}showSuccess();}else{alert('Ошибка: '+(data.description||'попробуйте ещё раз'));}}).catch(function(){btn.disabled=false;btn.querySelector('span').textContent='Отправить';alert('Ошибка сети. Проверьте соединение.');});}
 function showSuccess(){document.getElementById('overlay').classList.add('show');document.getElementById('successMsg').classList.add('show');setTimeout(function(){document.getElementById('overlay').classList.remove('show');document.getElementById('successMsg').classList.remove('show');},3000);}
 var cf=document.getElementById('contactForm');
-if(cf)cf.addEventListener('submit',function(e){e.preventDefault();var username=document.getElementById('username').value.trim(),message=document.getElementById('message').value.trim();var text='📩 <b>Новая заявка — Связаться</b>\\n\\n👤 <b>Telegram:</b> '+username+'\\n💬 <b>Сообщение:</b>\\n'+message;var btn=cf.querySelector('button[type="submit"]');sendToTelegram(text,btn).then(function(){cf.reset();});});
+if(cf)cf.addEventListener('submit',function(e){e.preventDefault();var username=document.getElementById('username').value.trim(),serviceType=document.getElementById('serviceType').value||'—',budgetRange=document.getElementById('budgetRange').value||'—',deadlinePref=document.getElementById('deadlinePref').value||'—',leadSource=document.getElementById('leadSource').value||'—',message=document.getElementById('message').value.trim();var text='📩 <b>Новая заявка — Услуги</b>\n\n👤 <b>Telegram:</b> '+username+'\n🛠 <b>Услуга:</b> '+serviceType+'\n💰 <b>Бюджет:</b> '+budgetRange+'\n⏱ <b>Дедлайн:</b> '+deadlinePref+'\n📣 <b>Источник:</b> '+leadSource+'\n\n📝 <b>Описание:</b>\n'+message;var btn=cf.querySelector('button[type="submit"]');sendToTelegram(text,btn).then(function(){cf.reset();});});
 var jf=document.getElementById('joinForm');
-if(jf)jf.addEventListener('submit',function(e){e.preventDefault();var username=document.getElementById('joinUsername').value.trim(),fullName=document.getElementById('fullName').value.trim(),spec=document.getElementById('specialization'),specText=spec.options[spec.selectedIndex].text,motiv=document.getElementById('motivation').value.trim();var text='🚀 <b>Новая заявка — Вступить в команду</b>\\n\\n👤 <b>Telegram:</b> '+username+'\\n📛 <b>Имя:</b> '+fullName+'\\n🛠 <b>Специализация:</b> '+specText+'\\n✍️ <b>О себе:</b>\\n'+motiv;var btn=jf.querySelector('button[type="submit"]');sendToTelegram(text,btn).then(function(){jf.reset();spec.value='';});});
+if(jf)jf.addEventListener('submit',function(e){e.preventDefault();var username=document.getElementById('joinUsername').value.trim(),fullName=document.getElementById('fullName').value.trim(),spec=document.getElementById('specialization').value||'—',level=document.getElementById('levelField').value||'—',exp=document.getElementById('experience').value||'—',avail=document.getElementById('availability').value||'—',rate=document.getElementById('rateField').value||'—',tz=document.getElementById('tzField').value||'—',portfolio=document.getElementById('portfolio').value.trim(),socials=document.getElementById('socials').value.trim()||'—',skills=document.getElementById('skillsField').value.trim(),motivation=document.getElementById('motivation').value.trim();var text='🚀 <b>Новая заявка — Команда</b>\n\n👤 <b>Telegram:</b> '+username+'\n📛 <b>Имя:</b> '+fullName+'\n🛠 <b>Роль:</b> '+spec+'\n⭐ <b>Уровень:</b> '+level+'\n📅 <b>Опыт:</b> '+exp+' лет\n🕐 <b>Доступность:</b> '+avail+'\n💵 <b>Ставка:</b> '+rate+'\n🌍 <b>Часовой пояс:</b> '+tz+'\n🔗 <b>Портфолио:</b> '+portfolio+'\n🌐 <b>Соцсети:</b> '+socials+'\n\n💻 <b>Навыки:</b>\n'+skills+'\n\n✍️ <b>Мотивация:</b>\n'+motivation;var btn=jf.querySelector('button[type="submit"]');sendToTelegram(text,btn).then(function(){jf.reset();document.getElementById('levelField').value='';document.querySelectorAll('.level-btn').forEach(function(b){b.classList.remove('active');});});});
 });
 </script>
 </body>
