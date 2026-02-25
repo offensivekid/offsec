@@ -601,14 +601,15 @@ if(jf)jf.addEventListener('submit',function(e){
   var text='<b>Новая заявка — Команда</b>\n\n<b>Telegram:</b> '+username+'\n<b>Имя:</b> '+fullName+'\n<b>Роль:</b> '+spec+'\n<b>Уровень:</b> '+level+'\n<b>Опыт:</b> '+exp+' лет\n<b>Доступность:</b> '+avail+'\n<b>Ставка:</b> '+rate+'\n<b>Часовой пояс:</b> '+tz+'\n<b>Портфолио:</b> '+portfolio+'\n<b>Соцсети:</b> '+socials+'\n\n<b>Навыки:</b>\n'+skills+'\n\n<b>Мотивация:</b>\n'+motivation;
   var btn=jf.querySelector('button[type="submit"]');
   btn.disabled=true;btn.querySelector('span').textContent='Отправка...';
+  console.log('join_apply payload:', {user_id:userId,text:text.substring(0,100)});
   fetch(window.location.origin+'/join_apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,text:text})})
     .then(function(r){return r.text();})
     .then(function(res){
       btn.disabled=false;btn.querySelector('span').textContent='Подать заявку';
       if(res==='ok'){if(tg)tg.HapticFeedback.notificationOccurred('success');showSuccess();jf.reset();document.getElementById('levelField').value='';document.querySelectorAll('.level-btn').forEach(function(b){b.classList.remove('active');});}
-      else{alert('Ошибка при отправке, попробуйте ещё раз');}
+      else{alert('Ошибка сервера: '+res);}
     })
-    .catch(function(){btn.disabled=false;btn.querySelector('span').textContent='Подать заявку';alert('Ошибка сети.');});
+    .catch(function(err){btn.disabled=false;btn.querySelector('span').textContent='Подать заявку';alert('Ошибка сети: '+err);});
 });
 });
 </script>
